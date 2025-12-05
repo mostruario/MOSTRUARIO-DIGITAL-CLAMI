@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>MOSTRUÁRIO DIGITAL</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #fdfdfd;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .header {
+            position: relative;
+            text-align: left;
+            margin-bottom: 15px;
+            padding-top: 40px;
+            padding-left: 10px;
+        }
+
+        .header img {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 80px;
+        }
+
+        h1 {
+            margin: 0 0 15px 0;
+            font-size: 32px;
+        }
+
+        .marca-titulo {
+            font-size: 17px;
+            margin: 40px 0 10px 5px;
+            font-weight: normal;
+        }
+
+        /* PILLS */
+        .filters-container {
+            display: flex;
+            gap: 20px;
+            margin: 15px 0 25px 5px;
+            position: relative;
+            z-index: 2000;
+        }
+
+        .filter-pill {
+            width: 150px;
+            background: #fff;
+            padding: 8px 12px;
+            border-radius: 40px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+            cursor: pointer;
+            position: relative;
+            user-select: none;
+            font-size: 14px;
+            transition: 0.25s ease;
+        }
+
+        .filter-pill.applied {
+            transform: translateY(-6px);
+        }
+
+        .dropdown {
+            position: absolute;
+            top: 50px;
+            left: 0;
+            width: 180px;
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 4px 18px rgba(0,0,0,0.20);
+            padding: 10px 8px;
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 9999;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 4px;
+            cursor: pointer;
+            border-radius: 6px;
+        }
+
+        .dropdown-item:hover {
+            background: #f1f1f1;
+        }
+
+        .apply-btn {
+            margin-top: 8px;
+            background: #000;
+            color: #fff;
+            border-radius: 20px;
+            padding: 6px 10px;
+            font-size: 13px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .apply-btn:hover {
+            background: #333;
+        }
+
+        .filter-pill input[type="text"] {
+            width: 100%;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 14px;
+        }
+
+        .carousel-wrapper {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .carousel {
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+        }
+
+        .carousel::-webkit-scrollbar {
+            display: none;
+        }
+
+        .arrow {
+            position: absolute;
+            top: 40%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.15);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            font-size: 20px;
+            color: #000;
+            z-index: 10;
+        }
+
+        .arrow-left { left: -10px; }
+        .arrow-right { right: -10px; }
+
+        .card {
+            min-width: 250px;
+            max-width: 250px;
+            background: white;
+            padding: 12px;
+            border-radius: 0px;
+            text-decoration: none;
+            color: black;
+            box-shadow: 0 0 5px #0003;
+        }
+
+        .card img {
+            width: 100%;
+            height: 200px;
+            object-fit: contain;
+        }
+
+        .card h3 {
+            margin: 10px 0 0 0;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .card .fornecedor {
+            margin: 4px 0 0 0;
+            color: #444;
+            font-size: 13px;
+        }
+
+        .btn-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .btn {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.05);
+            padding: 8px;
+            border-radius: 40px;
+            text-align: center;
+            color: #000;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 8px;
+            transition: 0.25s ease;
+        }
+
+        .btn:last-child {
+            margin-right: 0;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="header">
+    <img src="/static/LOGO CLAMI.png" alt="Logo">
+    <h1>MOSTRUÁRIO DIGITAL</h1>
+</div>
+
+<!-- FILTROS -->
+<div class="filters-container">
+
+    <!-- MARCA -->
+    <div class="filter-pill" id="pillMarca">
+        <span id="labelMarca">Marca</span>
+
+        <div class="dropdown" id="dropdownMarca">
+
+            <label class="dropdown-item">
+                <input type="checkbox" class="chkMarca chkMarcaTodas" data-value="todas"> Todas
+            </label>
+
+            {% for m in marcas %}
+            <label class="dropdown-item">
+                <input type="checkbox" class="chkMarca" data-value="{{ m }}"> {{ m }}
+            </label>
+            {% endfor %}
+
+            <div class="apply-btn" id="applyMarca">Aplicar</div>
+        </div>
+    </div>
+
+    <!-- CÓDIGO (ANTES ERA FORNECEDOR) -->
+    <div class="filter-pill" id="pillFornecedor">
+        <span id="labelFornecedor">Código</span>
+
+        <div class="dropdown" id="dropdownFornecedor">
+
+            <label class="dropdown-item">
+                <input type="checkbox" class="chkFornecedor chkFornecedorTodas" data-value="todas"> Todos
+            </label>
+
+            {% for f in fornecedores %}
+            <label class="dropdown-item">
+                <input type="checkbox" class="chkFornecedor" data-value="{{ f.codigo }}"> {{ f.codigo }}
+            </label>
+            {% endfor %}
+
+            <div class="apply-btn" id="applyFornecedor">Aplicar</div>
+        </div>
+    </div>
+
+    <!-- PESQUISA -->
+    <div class="filter-pill">
+        <input type="text" id="pesquisarProduto" placeholder="Pesquisar produto...">
+    </div>
+
+</div>
+
+{% for marcaAtual in marcas %}
+
+<div class="marca-titulo">{{ marcaAtual }}</div>
+
+<div class="carousel-wrapper">
+
+    <div class="arrow arrow-left" data-marca="{{ marcaAtual }}">&#10094;</div>
+    <div class="arrow arrow-right" data-marca="{{ marcaAtual }}">&#10095;</div>
+
+    <div class="carousel" id="carousel-{{ marcaAtual }}">
+
+        {% for p in produtos %}
+        {% if p.marca == marcaAtual %}
+
+        <div class="card"
+             data-marca="{{ p.marca }}"
+             data-fornecedor="{{ p.fornecedor }}"
+             data-nome="{{ p.nome|lower }}">
+
+            <img src="{{ p.imagem }}" alt="Imagem">
+            <h3>{{ p.nome }}</h3>
+            <div class="fornecedor">Código: {{ p.fornecedor|int }}</div>
+
+            <div class="btn-row">
+                <a class="btn" href="/produto/{{ p.nome }}">Acabamentos</a>
+                <a class="btn" href="/download/{{ p.nome }}">Download</a>
+            </div>
+        </div>
+
+        {% endif %}
+        {% endfor %}
+
+    </div>
+</div>
+
+{% endfor %}
+
+<script>
+/* DROPDOWNS */
+document.getElementById("pillMarca").addEventListener("click", function(e){
+    e.stopPropagation();
+    document.getElementById("dropdownMarca").style.display = "flex";
+});
+
+document.getElementById("pillFornecedor").addEventListener("click", function(e){
+    e.stopPropagation();
+    document.getElementById("dropdownFornecedor").style.display = "flex";
+});
+
+/* DESMARCAR AUTOMÁTICO — MARCA */
+document.querySelector(".chkMarcaTodas").addEventListener("change", function () {
+    if (this.checked) {
+        document.querySelectorAll(".chkMarca:not(.chkMarcaTodas)")
+            .forEach(c => c.checked = false);
+    }
+});
+
+document.querySelectorAll(".chkMarca:not(.chkMarcaTodas)").forEach(c => {
+    c.addEventListener("change", function () {
+        if (this.checked) {
+            document.querySelector(".chkMarcaTodas").checked = false;
+        }
+    });
+});
+
+/* DESMARCAR AUTOMÁTICO — CÓDIGO */
+document.querySelector(".chkFornecedorTodas").addEventListener("change", function () {
+    if (this.checked) {
+        document.querySelectorAll(".chkFornecedor:not(.chkFornecedorTodas)")
+            .forEach(c => c.checked = false);
+    }
+});
+
+document.querySelectorAll(".chkFornecedor:not(.chkFornecedorTodas)").forEach(c => {
+    c.addEventListener("change", function () {
+        if (this.checked) {
+            document.querySelector(".chkFornecedorTodas").checked = false;
+        }
+    });
+});
+
+/* PEGAR SELEÇÕES */
+function getSelections(selector){
+    let marcado = [...document.querySelectorAll(selector + ":checked")]
+        .map(e => e.dataset.value.toLowerCase());
+    if (marcado.includes("todas")) return [];
+    return marcado;
+}
+
+/* TEXTO DO PILL */
+function summaryTextFromSelections(selector, nome){
+    let marcado = [...document.querySelectorAll(selector + ":checked")]
+        .map(e => e.dataset.value);
+
+    if (marcado.includes("todas") || marcado.length === 0) return nome;
+    if (marcado.length === 1) return marcado[0];
+    return `${marcado.length} selecionados`;
+}
+
+let marcasSelecionadas = [];
+let fornecedoresSelecionados = [];
+
+/* APLICAR MARCA */
+document.getElementById("applyMarca").addEventListener("click", function(e){
+    e.stopPropagation();
+    marcasSelecionadas = getSelections(".chkMarca");
+    document.getElementById("labelMarca").textContent =
+        summaryTextFromSelections(".chkMarca", "Marca");
+
+    let pill = document.getElementById("pillMarca");
+    if (marcasSelecionadas.length === 0) pill.classList.remove("applied");
+    else pill.classList.add("applied");
+
+    document.getElementById("dropdownMarca").style.display = "none";
+    aplicarFiltros();
+});
+
+/* APLICAR CÓDIGO */
+document.getElementById("applyFornecedor").addEventListener("click", function(e){
+    e.stopPropagation();
+    fornecedoresSelecionados = getSelections(".chkFornecedor");
+    document.getElementById("labelFornecedor").textContent =
+        summaryTextFromSelections(".chkFornecedor", "Código");
+
+    let pill = document.getElementById("pillFornecedor");
+    if (fornecedoresSelecionados.length === 0) pill.classList.remove("applied");
+    else pill.classList.add("applied");
+
+    document.getElementById("dropdownFornecedor").style.display = "none";
+    aplicarFiltros();
+});
+
+/* PESQUISA */
+document.getElementById("pesquisarProduto").addEventListener("keyup", aplicarFiltros);
+
+/* FILTRAGEM FINAL */
+function aplicarFiltros() {
+
+    let busca = document.getElementById("pesquisarProduto").value.toLowerCase();
+
+    document.querySelectorAll(".marca-titulo, .carousel-wrapper")
+        .forEach(sec => sec.style.display = "none");
+
+    let contagemMarca = {};
+
+    document.querySelectorAll(".card").forEach(card => {
+
+        let marca = card.dataset.marca.toLowerCase();
+        let forn = card.dataset.fornecedor.toLowerCase();
+        let nome = card.dataset.nome.toLowerCase();
+
+        let okMarca = marcasSelecionadas.length === 0 || marcasSelecionadas.includes(marca);
+        let okFornecedor = fornecedoresSelecionados.length === 0 || fornecedoresSelecionados.includes(forn);
+        let okBusca = busca === "" || nome.includes(busca);
+
+        if (okMarca && okFornecedor && okBusca) {
+
+            card.style.display = "block";
+
+            if (!contagemMarca[marca]) contagemMarca[marca] = 0;
+            contagemMarca[marca]++;
+
+        } else {
+            card.style.display = "none";
+        }
+    });
+
+    document.querySelectorAll(".marca-titulo").forEach(titulo => {
+        let marca = titulo.textContent.trim().toLowerCase();
+        titulo.style.display = contagemMarca[marca] > 0 ? "block" : "none";
+    });
+
+    document.querySelectorAll(".carousel-wrapper").forEach(wrapper => {
+        let marca = wrapper.previousElementSibling.textContent.trim().toLowerCase();
+        wrapper.style.display = contagemMarca[marca] > 0 ? "block" : "none";
+    });
+
+}
+
+/* SETAS DO CARROSSEL */
+document.querySelectorAll(".arrow-right").forEach(btn => {
+    btn.addEventListener("click", () => {
+        let marca = btn.dataset.marca;
+        document.getElementById("carousel-" + marca).scrollLeft += 270;
+    });
+});
+document.querySelectorAll(".arrow-left").forEach(btn => {
+    btn.addEventListener("click", () => {
+        let marca = btn.dataset.marca;
+        document.getElementById("carousel-" + marca).scrollLeft -= 270;
+    });
+});
+</script>
+
+</body>
+</html>
+
+
+
+
+
