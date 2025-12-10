@@ -308,12 +308,40 @@ def detalhes(nome):
     )
 
 # ------------------------------------------
-# ROTA INDEX (mantida, sem filtro)
+# ROTA INDEX (atualizada com filtros)
 # ------------------------------------------
-@app.route("/")
+@app.route("/", methods=["GET"])
 def index():
+    # Recebe filtros do formulário — agora aceitando múltiplos valores (marca[] / fornecedor[])
+    marca_filtro = request.args.getlist("marca[]") or []
+    fornecedor_filtro = request.args.getlist("fornecedor[]") or []
+    pesquisar_produto = request.args.get("pesquisar_produto", "").strip()
+
+    # normaliza strings e remove itens vazios
+    marca_filtro = [str(x).strip() for x in marca_filtro if str(x).strip() != ""]
+    fornecedor_filtro = [str(x).strip() for x in fornecedor_filtro if str(x).strip() != ""]
+
+    # tratar "Todas" / "Todos" caso algum checkbox envie esse valor
+    marca_filtro = [] if any(x.lower() in ["todas", "todos"] for x in marca_filtro) else marca_filtro
+    fornecedor_filtro = [] if any(x.lower() in ["todas", "todos"] for x in fornecedor_filtro) else fornecedor_filtro
+
+    df = df_produtos.copy()
+
+    # Aplica filtros (agora suportando listas)
+    if marca_filtro:
+        df = df[df["MARCA"].astype(str).str.strip().isin(marca_filtro)]
+
+    if fornecedor_filtro:
+        df = df[df["FORNECEDOR"].astype(str).str.strip().isin(fornecedor_filtro)]
+
+    if pesquisar_produto:
+        termo_norm = remover_acentos(pesquisar_produto).lower()
+        df["PRODUTO_SEMC"] = df["PRODUTO"].astype(str).apply(remover_acentos).str.lower()
+        df = df[df["PRODUTO_SEMC"].str.contains(termo_norm, na=False)]
+
+    # Monta lista de produtos
     lista_produtos = []
-    df_unicos = df_produtos.groupby("PRODUTO").first().reset_index()
+    df_unicos = df.groupby("PRODUTO").first().reset_index()
 
     for _, row in df_unicos.iterrows():
         nome = row["PRODUTO"]
@@ -338,44 +366,19 @@ def index():
 
     lista_produtos.sort(key=lambda x: int(x["fornecedor"]) if str(x["fornecedor"]).isdigit() else x["fornecedor"])
 
-    # Mantendo marcas e fornecedores para a página inicial
-    marcas = []
-    if "MARCA" in df_produtos.columns:
-        marcas = (
-            df_produtos["MARCA"]
-            .dropna()
-            .astype(str)
-            .str.strip()
-            .replace("", pd.NA)
-            .dropna()
-            .unique()
-            .tolist()
-        )
-        marcas = sorted(marcas)
+    # Listas de marcas e fornecedores para filtros (mantive usando todos os produtos originais)
+    marcas = sorted(df_produtos["MARCA"].dropna().astype(str).str.strip().unique())
+    fornecedores = sorted(df_produtos["FORNECEDOR"].dropna().astype(str).str.strip().unique())
 
-    fornecedores_raw = []
-    if "FORNECEDOR" in df_produtos.columns:
-        fornecedores_raw = (
-            df_produtos["FORNECEDOR"]
-            .dropna()
-            .astype(str)
-            .str.strip()
-            .replace("", pd.NA)
-            .dropna()
-            .unique()
-            .tolist()
-        )
-
-    fornecedores_int = []
-    for f in fornecedores_raw:
-        try:
-            fornecedores_int.append(str(int(float(f))))
-        except:
-            fornecedores_int.append(f)
-    fornecedores_int = sorted(fornecedores_int, key=lambda x: int(x) if x.isdigit() else x)
-    fornecedores = [{"codigo": f} for f in fornecedores_int]
-
-    return render_template("index.html", produtos=lista_produtos, marcas=marcas, fornecedores=fornecedores)
+    return render_template(
+        "index.html",
+        produtos=lista_produtos,
+        marcas=marcas,
+        fornecedores=fornecedores,
+        marca_selecionada=marca_filtro,
+        fornecedor_selecionado=fornecedor_filtro,
+        produto_pesquisado=pesquisar_produto
+    )
 
 # ------------------------------------------
 # RUN
