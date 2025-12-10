@@ -2,6 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MOSTRUÁRIO DIGITAL</title>
 
     <style>
@@ -36,82 +37,6 @@
             font-size: 17px;
             margin: 40px 0 10px 5px;
             font-weight: normal;
-        }
-
-        .filters-container {
-            display: flex;
-            gap: 20px;
-            margin: 15px 0 25px 5px;
-            position: relative;
-            z-index: 2000;
-        }
-
-        .filter-pill {
-            width: 150px;
-            background: #fff;
-            padding: 8px 12px;
-            border-radius: 40px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
-            cursor: pointer;
-            position: relative;
-            user-select: none;
-            font-size: 14px;
-            transition: 0.25s ease;
-        }
-
-        .filter-pill.applied {
-            transform: translateY(-6px);
-        }
-
-        .dropdown {
-            position: absolute;
-            top: 50px;
-            left: 0;
-            width: 180px;
-            background: #fff;
-            border-radius: 14px;
-            box-shadow: 0 4px 18px rgba(0,0,0,0.20);
-            padding: 10px 8px;
-            display: none;
-            flex-direction: column;
-            gap: 8px;
-            z-index: 9999;
-        }
-
-        .dropdown-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 4px;
-            cursor: pointer;
-            border-radius: 6px;
-        }
-
-        .dropdown-item:hover {
-            background: #f1f1f1;
-        }
-
-        .apply-btn {
-            margin-top: 8px;
-            background: #000;
-            color: #fff;
-            border-radius: 20px;
-            padding: 6px 10px;
-            font-size: 13px;
-            text-align: center;
-            cursor: pointer;
-        }
-
-        .apply-btn:hover {
-            background: #333;
-        }
-
-        .filter-pill input[type="text"] {
-            width: 100%;
-            border: none;
-            outline: none;
-            background: transparent;
-            font-size: 14px;
         }
 
         .carousel-wrapper {
@@ -198,110 +123,74 @@
             transition: 0.25s ease;
         }
 
+        /* RESPONSIVIDADE */
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            h1 { font-size: 24px; }
+            .card { min-width: 180px; max-width: 100%; }
+            .card img { height: auto; }
+            .carousel { gap: 10px; }
+            .marca-titulo { font-size: 16px; margin: 20px 0 8px 5px; }
+            .btn { font-size: 11px; padding: 6px; }
+            .arrow { width: 30px; height: 30px; font-size: 16px; }
+        }
+
+        @media (max-width: 480px) {
+            h1 { font-size: 20px; }
+            .card img { height: 120px; }
+        }
     </style>
 </head>
 
 <body>
-
 <div class="header">
     <img src="/static/LOGO CLAMI.png" alt="Logo">
     <h1>MOSTRUÁRIO DIGITAL</h1>
 </div>
 
-<!-- FILTROS -->
-<div class="filters-container">
-
-    <!-- MARCA -->
-    <div class="filter-pill" id="pillMarca">
-        <span id="labelMarca">Marca</span>
-
-        <div class="dropdown" id="dropdownMarca">
-
-            <label class="dropdown-item">
-                <input type="checkbox" class="chkMarca chkMarcaTodas" data-value="todas"> Todas
-            </label>
-
-            {% for m in marcas %}
-            <label class="dropdown-item">
-                <input type="checkbox" class="chkMarca" data-value="{{ m }}"> {{ m }}
-            </label>
-            {% endfor %}
-
-            <div class="apply-btn" id="applyMarca">Aplicar</div>
-        </div>
-    </div>
-
-    <!-- CÓDIGO -->
-    <div class="filter-pill" id="pillFornecedor">
-        <span id="labelFornecedor">Código</span>
-
-        <div class="dropdown" id="dropdownFornecedor">
-
-            <label class="dropdown-item">
-                <input type="checkbox" class="chkFornecedor chkFornecedorTodas" data-value="todas"> Todos
-            </label>
-
-            {% for f in fornecedores %}
-            <label class="dropdown-item">
-                <input type="checkbox" class="chkFornecedor" data-value="{{ f.codigo }}"> {{ f.codigo }}
-            </label>
-            {% endfor %}
-
-            <div class="apply-btn" id="applyFornecedor">Aplicar</div>
-        </div>
-    </div>
-
-    <!-- PESQUISA -->
-    <div class="filter-pill">
-        <input type="text" id="pesquisarProduto" placeholder="Pesquisar produto...">
-    </div>
-
-</div>
-
 {% for marcaAtual in marcas %}
-
 <div class="marca-titulo">{{ marcaAtual }}</div>
-
 <div class="carousel-wrapper">
-
     <div class="arrow arrow-left" data-marca="{{ marcaAtual }}">&#10094;</div>
     <div class="arrow arrow-right" data-marca="{{ marcaAtual }}">&#10095;</div>
-
     <div class="carousel" id="carousel-{{ marcaAtual }}">
-
         {% for p in produtos %}
         {% if p.marca == marcaAtual %}
-
         <div class="card"
              data-marca="{{ p.marca }}"
              data-fornecedor="{{ p.fornecedor }}"
              data-nome="{{ p.nome|lower }}">
-
             <img src="{{ p.imagem }}" alt="Imagem">
             <h3>{{ p.nome }}</h3>
             <div class="fornecedor">Código: {{ p.fornecedor|int }}</div>
-
             <div class="btn-row">
                 <a class="btn" href="/produto/{{ p.nome }}">Acabamentos</a>
             </div>
         </div>
-
         {% endif %}
         {% endfor %}
-
     </div>
 </div>
-
 {% endfor %}
 
 <script>
-/* todo o JS permanece exatamente igual */
+document.querySelectorAll(".arrow-left").forEach(btn => {
+    btn.addEventListener("click", function() {
+        let marca = this.dataset.marca;
+        let car = document.getElementById("carousel-" + marca);
+        car.scrollBy({ left: -250, behavior: "smooth" });
+    });
+});
+document.querySelectorAll(".arrow-right").forEach(btn => {
+    btn.addEventListener("click", function() {
+        let marca = this.dataset.marca;
+        let car = document.getElementById("carousel-" + marca);
+        car.scrollBy({ left: 250, behavior: "smooth" });
+    });
+});
 </script>
 
 </body>
 </html>
-
-
-
 
 

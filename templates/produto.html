@@ -2,6 +2,7 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{{ nome }}</title>
 <style>
 body {
@@ -168,7 +169,6 @@ h1 { font-size: 22px; margin-bottom: 4px; }
 }
 .btn-aplicar:hover { background: #333; }
 
-/* NOVO: campo de pesquisa idêntico ao layout dos filtros */
 .input-pesquisa {
     width: 150px;
     padding: 6px 12px;
@@ -181,10 +181,28 @@ h1 { font-size: 22px; margin-bottom: 4px; }
 .input-pesquisa:hover {
     box-shadow: 0 6px 16px rgba(0,0,0,0.2);
 }
+
+/* RESPONSIVIDADE */
+@media (max-width: 768px) {
+    body { padding: 10px; }
+    h1 { font-size: 20px; }
+    .card { min-height: auto; }
+    .card img { height: auto; }
+    .acabamentos-grid {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 8px;
+    }
+    .btn-aplicar, .input-pesquisa, .selectBox { font-size: 12px; padding: 5px; }
+}
+
+@media (max-width: 480px) {
+    h1 { font-size: 18px; }
+    .acabamentos-grid { grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); }
+    .card img { height: 100px; }
+}
 </style>
 </head>
 <body>
-
 <div class="container">
 
 <img src="{{ url_for('static', filename='LOGO CLAMI.png') }}" alt="Logo" class="logo">
@@ -204,17 +222,14 @@ h1 { font-size: 22px; margin-bottom: 4px; }
 
 <!-- FILTROS -->
 <div class="filtros">
-
     <!-- Acabamento -->
     <div class="multiselect">
         <div class="selectBox" onclick="toggleCheckboxes('acabamento')">Acabamento</div>
         <div class="checkboxes" id="checkboxes-acabamento">
             <label><input type="checkbox" value="todos" onclick="selecionarTodos(this,'acabamento')"> Todos</label>
-
             {% for acabamento in acabamentos_lista %}
             <label><input type="checkbox" value="{{ acabamento }}" onclick="selecionarAcabamento(this)"> {{ acabamento }}</label>
             {% endfor %}
-
             <button class="btn-aplicar" onclick="aplicarFiltro('acabamento')">Aplicar Filtro</button>
         </div>
     </div>
@@ -231,9 +246,8 @@ h1 { font-size: 22px; margin-bottom: 4px; }
         </div>
     </div>
 
-    <!-- NOVO FILTRO — Pesquisar acabamento -->
+    <!-- Pesquisa -->
     <input type="text" id="pesq-acab" class="input-pesquisa" placeholder="Pesquisar acabamento" onkeyup="filtrarPesquisaLivre()">
-
 </div>
 
 <div id="blocosAcabamentos">
@@ -254,7 +268,6 @@ h1 { font-size: 22px; margin-bottom: 4px; }
                             </div>
                         {% endif %}
                         <img src="{{ item.IMG }}" alt="{{ item.TIPO }}">
-                        
                         <div style="margin-top: 8px;">
                             <div class="acab-nome">{{ item.TIPO }}</div>
                             {% if item.STATUS %}
@@ -278,9 +291,7 @@ h1 { font-size: 22px; margin-bottom: 4px; }
 
 <div style="text-align: left; margin-top: 30px;">
     <a href="/" class="voltar-topo" title="Voltar">
-        <svg width="20" height="20">
-            <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" fill="none"></path>
-        </svg>
+        <svg width="20" height="20"><path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" fill="none"></path></svg>
     </a>
 </div>
 
@@ -332,7 +343,6 @@ function filtrar(selAcab = [], selStatus = [], textoLivre = "") {
             const cardTipo = card.dataset.tipo;
 
             let mostrar = true;
-
             if(selAcab.length && !selAcab.includes(cardAcab)) mostrar = false;
             if(selStatus.length && !selStatus.includes(cardStatus)) mostrar = false;
             if(textoLivre && !cardTipo.includes(textoLivre)) mostrar = false;
