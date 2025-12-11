@@ -16,8 +16,8 @@
         .header {
             position: relative;
             text-align: left;
-            margin-bottom: 25px; /* AUMENTADO PARA DAR ESPAÇO NO CELULAR */
-            padding-top: 60px;   /* AUMENTADO */
+            margin-bottom: 15px;
+            padding-top: 40px;
             padding-left: 10px;
         }
 
@@ -58,7 +58,6 @@
             background: #fff;
             cursor: pointer;
             box-shadow: 0px 6px 18px rgba(0,0,0,0.25);
-            color: #000;
         }
 
         .dropdown-content {
@@ -78,11 +77,11 @@
             padding: 6px 12px;
             cursor: pointer;
             font-size: 14px;
-            color: #000 !important; /* PRETO NO CELULAR */
+            color: #000 !important;
         }
 
         .dropdown-content label input {
-            accent-color: #000 !important; /* checkbox preto */
+            accent-color: #000 !important;
         }
 
         .dropdown-content label:hover {
@@ -108,7 +107,7 @@
             text-align: center;
         }
 
-        /* PESQUISA */
+        /* PESQUISAR PRODUTO */
         .filtros input[type="text"] {
             padding: 8px 12px;
             font-size: 14px;
@@ -117,14 +116,12 @@
             width: 200px;
             box-shadow: 0px 6px 18px rgba(0,0,0,0.25);
             background: #fff;
-            color: #000;
         }
 
-        /* MOBILE AJUSTE (logo + filtros) */
+        /* --- MOBILE AJUSTE: PESQUISA MESMA LARGURA DOS FILTROS --- */
         @media (max-width: 600px) {
-            .header {
-                margin-bottom: 35px; /* AUMENTA O ESPAÇO NO CELULAR */
-                padding-top: 80px;   /* AUMENTA MAIS */
+            .filtros input[type="text"] {
+                width: 200px !important; /* mesmo tamanho dos filtros */
             }
         }
 
@@ -248,7 +245,7 @@
         </div>
     </div>
 
-    <!-- FORNECEDORES ORDENADOS -->
+    <!-- FORNECEDORES -->
     <div class="dropdown" id="dropdown-fornecedor">
         <button type="button">Código</button>
         <div class="dropdown-content">
@@ -268,7 +265,7 @@
         </div>
     </div>
 
-    <!-- PESQUISAR -->
+    <!-- PESQUISA -->
     <input type="text" name="pesquisar_produto" placeholder="Pesquisar produto..." value="{{ produto_pesquisado }}">
 </form>
 
@@ -307,7 +304,7 @@ document.querySelectorAll('.dropdown button').forEach(btn => {
     });
 });
 
-/* CLICK FORA */
+/* CLICK OUTSIDE */
 document.addEventListener('click', e => {
     document.querySelectorAll('.dropdown').forEach(drop => {
         if (!drop.contains(e.target)) drop.classList.remove('open');
@@ -333,6 +330,8 @@ document.querySelector('.fornecedor-todas').addEventListener('change', function(
 
 </body>
 </html>
+
+
 
 
 
